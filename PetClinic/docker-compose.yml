@@ -77,6 +77,19 @@ services:
       - "9090:9090"
     networks:
       - app-network
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: petclinic-frontend
+    restart: unless-stopped
+    depends_on:
+      api-gateway:
+        condition: service_started
+    ports:
+      - "5173:80"
+    networks:
+      - app-network
 
   ml-service:
     build:
@@ -99,8 +112,6 @@ services:
     command: mvn -pl api-gateway spring-boot:run
     depends_on:
       eureka-server:
-        condition: service_started
-      main-service:
         condition: service_started
       ml-service:
         condition: service_started
